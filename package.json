@@ -1,6 +1,6 @@
 {
   "name": "@carcierge/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Core business logic for Carcierge widgets - trade-in, payments, offers",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
