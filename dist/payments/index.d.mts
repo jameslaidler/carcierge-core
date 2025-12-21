@@ -27,6 +27,14 @@ declare function calculatePayment(params: {
     tax2: number;
     interestRates?: InterestRate[];
 }): PaymentResult;
+declare function calculatePaymentWithAnnualRateOverride(params: {
+    vehicle: VehicleInfo;
+    paymentConfig: PaymentConfig;
+    docFee: number;
+    tax1: number;
+    tax2: number;
+    annualRate: number;
+}): PaymentResult;
 declare function calculateCashPrice(params: {
     vehicle: VehicleInfo;
     paymentConfig: Partial<PaymentConfig>;
@@ -63,4 +71,4 @@ declare function formatNumber(amount: number): string;
 declare function formatFrequencyLabel(frequency: string): string;
 declare function formatCreditLabel(score: string): string;
 
-export { MINIMUM_FINANCE_AMOUNT, calculateBorrowCost, calculateCashPrice, calculateMaxDiscount, calculateNetTradeValue, calculatePayment, calculateTaxAmount, convertToFrequency, determineRate, formatCreditLabel, formatCurrency, formatFrequencyLabel, formatNumber, formatWholeNumber, getAvailableTerms, getMaxTerm, getRateForVehicle, isVehicleFinanceable };
+export { MINIMUM_FINANCE_AMOUNT, calculateBorrowCost, calculateCashPrice, calculateMaxDiscount, calculateNetTradeValue, calculatePayment, calculatePaymentWithAnnualRateOverride, calculateTaxAmount, convertToFrequency, determineRate, formatCreditLabel, formatCurrency, formatFrequencyLabel, formatNumber, formatWholeNumber, getAvailableTerms, getMaxTerm, getRateForVehicle, isVehicleFinanceable };

@@ -25,6 +25,7 @@ export {
   convertToFrequency,
   calculateBorrowCost,
   calculatePayment,
+  calculatePaymentWithAnnualRateOverride,
   calculateCashPrice,
   calculateMaxDiscount,
   getMaxTerm,
@@ -57,6 +58,9 @@ export {
   type VehicleCondition,
   type DealType,
 } from './doc-fees';
+
+// Incentives module
+export * from './incentives';
 
 // Offers module
 export {

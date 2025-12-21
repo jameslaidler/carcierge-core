@@ -8,6 +8,7 @@ export default defineConfig({
     'offers/index': 'src/offers/index.ts',
     'doc-fees/index': 'src/doc-fees/index.ts',
     'product-config/index': 'src/product-config/index.ts',
+    'incentives/index': 'src/incentives/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: true,

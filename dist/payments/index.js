@@ -26,6 +26,7 @@ __export(payments_exports, {
   calculateMaxDiscount: () => calculateMaxDiscount,
   calculateNetTradeValue: () => calculateNetTradeValue,
   calculatePayment: () => calculatePayment,
+  calculatePaymentWithAnnualRateOverride: () => calculatePaymentWithAnnualRateOverride,
   calculateTaxAmount: () => calculateTaxAmount,
   convertToFrequency: () => convertToFrequency,
   determineRate: () => determineRate,
@@ -51,12 +52,15 @@ function determineRate(creditScore, vehicle, interestRates, requestedTerm) {
     (best, rate) => !best || rate.year > best.year ? rate : best,
     null
   );
+  const maxTerm = applicableRate?.max_term ?? requestedTerm;
+  const termIsAllowed = typeof applicableRate?.max_term === "number" ? requestedTerm <= applicableRate.max_term : true;
+  const isFinanceable = !!applicableRate && termIsAllowed;
   return {
     rate: applicableRate?.rate ?? 5,
-    maxTerm: applicableRate?.max_term ?? requestedTerm,
-    isFinanceable: !!applicableRate,
+    maxTerm,
+    isFinanceable,
     effectiveRate: applicableRate?.rate ?? 5,
-    effectiveTerm: Math.min(requestedTerm, applicableRate?.max_term ?? requestedTerm)
+    effectiveTerm: requestedTerm
   };
 }
 function calculateTaxAmount(params) {
@@ -124,6 +128,21 @@ function calculatePayment(params) {
     interestRates,
     paymentConfig.term
   );
+  if (!rateInfo.isFinanceable) {
+    return {
+      payment: null,
+      amountFinanced,
+      totalCost: 0,
+      taxAmount,
+      priceBeforeTax,
+      priceAfterTax,
+      isFinanceable: false,
+      effectiveRate: rateInfo.effectiveRate,
+      effectiveTerm: rateInfo.effectiveTerm,
+      borrowCost: 0,
+      term: paymentConfig.term
+    };
+  }
   const monthlyPayment = calculateBaseMonthlyPayment(
     amountFinanced,
     rateInfo.effectiveTerm,
@@ -154,6 +173,58 @@ function calculatePayment(params) {
     isFinanceable: rateInfo.isFinanceable,
     effectiveRate: rateInfo.effectiveRate,
     effectiveTerm: rateInfo.effectiveTerm,
+    borrowCost,
+    term: paymentConfig.term
+  };
+}
+function calculatePaymentWithAnnualRateOverride(params) {
+  const { vehicle, paymentConfig, docFee, tax1, tax2, annualRate } = params;
+  const includeTaxes = paymentConfig.includeTaxes ?? false;
+  const netTradeValue = paymentConfig.tradeInValue ? calculateNetTradeValue(paymentConfig.tradeInValue, paymentConfig.lien ?? 0) : 0;
+  const basePrice = vehicle.salePrice + docFee;
+  const priceAfterDiscount = basePrice - (paymentConfig.discountRequest ?? 0);
+  const priceAfterTrade = Math.max(0, priceAfterDiscount - netTradeValue);
+  const priceAfterDown = priceAfterTrade - (paymentConfig.downPayment ?? 0);
+  const taxAmount = includeTaxes ? calculateTaxAmount({
+    salePrice: vehicle.salePrice,
+    discountRequest: paymentConfig.discountRequest ?? 0,
+    tradeInValue: paymentConfig.tradeInValue ?? 0,
+    tax1,
+    tax2
+  }) : 0;
+  const priceBeforeTax = priceAfterDown;
+  const priceAfterTax = priceBeforeTax + taxAmount;
+  const amountFinanced = priceAfterTax;
+  const monthlyPayment = calculateBaseMonthlyPayment(
+    amountFinanced,
+    paymentConfig.term,
+    annualRate
+  );
+  const payment = monthlyPayment ? convertToFrequency(monthlyPayment, paymentConfig.frequency) : null;
+  const totalCost = payment ? calculateTotalCost({
+    payment,
+    frequency: paymentConfig.frequency,
+    term: paymentConfig.term,
+    downPayment: paymentConfig.downPayment ?? 0
+  }) : 0;
+  const borrowCost = calculateBorrowCost(
+    vehicle.salePrice,
+    paymentConfig.discountRequest ?? 0,
+    paymentConfig.downPayment ?? 0,
+    paymentConfig.tradeInValue ?? 0,
+    paymentConfig.term,
+    annualRate
+  );
+  return {
+    payment,
+    amountFinanced,
+    totalCost,
+    taxAmount,
+    priceBeforeTax,
+    priceAfterTax,
+    isFinanceable: true,
+    effectiveRate: annualRate,
+    effectiveTerm: paymentConfig.term,
     borrowCost,
     term: paymentConfig.term
   };
@@ -255,6 +326,7 @@ function formatCreditLabel(score) {
   calculateMaxDiscount,
   calculateNetTradeValue,
   calculatePayment,
+  calculatePaymentWithAnnualRateOverride,
   calculateTaxAmount,
   convertToFrequency,
   determineRate,

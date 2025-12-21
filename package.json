@@ -1,6 +1,6 @@
 {
   "name": "@carcierge/core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Core business logic for Carcierge widgets - trade-in, payments, offers",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -25,6 +25,11 @@
       "types": "./dist/offers/index.d.ts",
       "import": "./dist/offers/index.mjs",
       "require": "./dist/offers/index.js"
+    },
+    "./incentives": {
+      "types": "./dist/incentives/index.d.ts",
+      "import": "./dist/incentives/index.mjs",
+      "require": "./dist/incentives/index.js"
     }
   },
   "scripts": {
