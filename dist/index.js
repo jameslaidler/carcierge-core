@@ -419,12 +419,7 @@ function calculateMaxDiscountFromConfig(params) {
   const { salePrice, cost, condition, config } = params;
   let rawDiscount;
   if (condition === "new") {
-    if (cost && cost > 0) {
-      const profitMargin = salePrice - cost;
-      rawDiscount = profitMargin * (config.profit_span / 100);
-    } else {
-      rawDiscount = config.default_span;
-    }
+    rawDiscount = salePrice * (config.new_span / 100);
   } else {
     rawDiscount = salePrice * (config.used_span / 100);
   }

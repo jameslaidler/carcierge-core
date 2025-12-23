@@ -5,6 +5,7 @@
 
 export interface EcommWidgetConfig {
   profit_span: number;        // % of profit margin allowed as discount (new vehicles with cost)
+  new_span: number;           // % of sale price allowed as discount (new vehicles)
   used_span: number;          // % of sale price allowed as discount (used vehicles)
   default_span: number;       // Fallback discount $ (new vehicles without cost)
   incl_disc_span: boolean;    // Include discount in span calculation
@@ -35,8 +36,7 @@ interface SpanCalculationParams {
  * Calculate max discount (span) for a vehicle based on product config
  * 
  * Logic:
- * - New with cost: (salePrice - cost) * profit_span%
- * - New without cost: default_span (fallback)
+ * - New: salePrice * new_span%
  * - Used: salePrice * used_span%
  */
 export function calculateMaxDiscountFromConfig(params: SpanCalculationParams): number {
@@ -45,14 +45,16 @@ export function calculateMaxDiscountFromConfig(params: SpanCalculationParams): n
   let rawDiscount: number;
   
   if (condition === 'new') {
-    if (cost && cost > 0) {
-      // New with cost: % of profit margin
-      const profitMargin = salePrice - cost;
-      rawDiscount = profitMargin * (config.profit_span / 100);
-    } else {
-      // New without cost: use default span
-      rawDiscount = config.default_span;
-    }
+    rawDiscount = salePrice * (config.new_span / 100);
+
+    // if (cost && cost > 0) {
+    //   // New with cost: % of profit margin
+    //   const profitMargin = salePrice - cost;
+    //   rawDiscount = profitMargin * (config.profit_span / 100);
+    // } else {
+    //   // New without cost: use default span
+    //   rawDiscount = config.default_span;
+    // }
   } else {
     // Used: % of sale price
     rawDiscount = salePrice * (config.used_span / 100);

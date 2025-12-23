@@ -1,5 +1,6 @@
 interface EcommWidgetConfig {
     profit_span: number;
+    new_span: number;
     used_span: number;
     default_span: number;
     incl_disc_span: boolean;
@@ -27,8 +28,7 @@ interface SpanCalculationParams {
  * Calculate max discount (span) for a vehicle based on product config
  *
  * Logic:
- * - New with cost: (salePrice - cost) * profit_span%
- * - New without cost: default_span (fallback)
+ * - New: salePrice * new_span%
  * - Used: salePrice * used_span%
  */
 declare function calculateMaxDiscountFromConfig(params: SpanCalculationParams): number;
