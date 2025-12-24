@@ -17,6 +17,7 @@ interface DocFee {
 interface ApplicableFee {
     name: string;
     value: number;
+    description?: string;
 }
 interface DocFeeResult {
     totalFee: number;

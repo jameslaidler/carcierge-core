@@ -24,6 +24,7 @@ export interface DocFee {
 export interface ApplicableFee {
   name: string;
   value: number;
+  description?: string;
 }
 
 export interface DocFeeResult {
@@ -64,6 +65,7 @@ export function getApplicableFees(
   const fees: ApplicableFee[] = applicableFees.map(fee => ({
     name: fee.name,
     value: fee.value,
+    description: fee.description,
   }));
 
   const totalFee = fees.reduce((sum, fee) => sum + fee.value, 0);

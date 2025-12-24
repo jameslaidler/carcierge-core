@@ -35,7 +35,8 @@ function getApplicableFees(allFees, condition, dealType) {
   }).sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
   const fees = applicableFees.map((fee) => ({
     name: fee.name,
-    value: fee.value
+    value: fee.value,
+    description: fee.description
   }));
   const totalFee = fees.reduce((sum, fee) => sum + fee.value, 0);
   return { totalFee, fees };
